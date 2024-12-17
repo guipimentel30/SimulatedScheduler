@@ -1,10 +1,16 @@
 class Processo():
     def __init__(self, id, cpuPhase1, io, cpuPhase2):
         self.id = id
+        self.state = self.states[0]
+
         self.cpuPhase1 = cpuPhase1
         self.io = io
         self.cpuPhase2 = cpuPhase2
-        self.state = self.states[0]
+
+        self.phase1Remaining = cpuPhase1
+        self.ioRemaining = io
+        self.phase2Remaining = cpuPhase2
+        
     states = ["novo", "pronto", "executando", "terminado", "bloqueado"]
 
     def newToReady(self):
