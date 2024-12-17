@@ -1,6 +1,7 @@
 class Processo():
-    def __init__(self, id, cpuPhase1, io, cpuPhase2):
+    def __init__(self, id, cpuPhase1, io, cpuPhase2, size):
         self.id = id
+        self.size = size
         self.state = self.states[0]
 
         self.cpuPhase1 = cpuPhase1
@@ -30,5 +31,3 @@ class Processo():
     
     def runningToEnd(self):
         self.state = self.states[3]
-    
-    def 
