@@ -1,5 +1,8 @@
 from processo import Processo
 
+t = 0
+
+auxiliarQueue = []
 readyQueue = []
 memory = [0] * 32768 
 
