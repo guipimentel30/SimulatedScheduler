@@ -14,4 +14,3 @@ class GeradoraDeProcessos():
             processo = Processo(self.id, cpuPhase1, cpuIO, cpuPhase2, size)
             self.id += 1
             newQueue.append(processo)
-            

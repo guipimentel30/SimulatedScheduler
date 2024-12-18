@@ -11,7 +11,3 @@ class Despachante():
                     break
                 cpu.processo = processo
                 processo.readyToRunning()
-
-                
-                    
-            
