@@ -1,5 +1,5 @@
 import random
-from processo import Processo
+from process import Process
 
 class GeradoraDeProcessos():
     id = 0
@@ -11,6 +11,6 @@ class GeradoraDeProcessos():
             cpuIO = random.randint(0, 15)
             cpuPhase2 = random.randint(0, 20)
             size = random.randint(128, 2048)
-            processo = Processo(self.id, cpuPhase1, cpuIO, cpuPhase2, size)
+            process = Process(self.id, cpuPhase1, cpuIO, cpuPhase2, size)
             self.id += 1
-            newQueue.append(processo)
+            newQueue.append(process)

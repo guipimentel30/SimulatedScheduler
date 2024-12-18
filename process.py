@@ -1,4 +1,4 @@
-class Processo():                                                                                     
+class Process():                                                                                     
     def __init__(self, id, cpuPhase1, io, cpuPhase2, size):
         self.id = id
         self.size = size
@@ -47,14 +47,15 @@ class Processo():
                 if self.ioRemaining != 0:
                     self.state = self.states[4]
                     ioProcesses.append(self)
+                    return "block"
                     ##  Retorna?            ## 
                 #  Se não possui mais fases: #    
                 elif self.phase2Remaining == 0:
                     self.state = self.states[3]
-                    ##  Termina o processo  ##
-                    ##  Retorna?            ## 
-                    pass
-        
+                    return "ended"
+                    ##  Termina o process  ##
+            return "execute"
+
         #  Se a fase IO não foi terminada:  # 
         elif self.ioRemaining != 0:
             self.ioRemaining -= 1
@@ -64,31 +65,18 @@ class Processo():
                     self.state = self.states[1]
                     ioProcesses.remove(self) #?
                     auxiliarQueue.append(self)
-                    ##  Retorna?            ## 
+                    return "execute"
                 #  Se não possui uma fase 2: #
                 else:
                     self.state = self.states[3]
-                    ##  Termina o processo  ##
-                    ##  Retorna?            ## 
-                    pass
-            
+                    ##  Termina o process  ##
+                    return "ended"
+            return "blocked"
         #  Se a fase 2 não foi terminada:   #
         else:
             self.phase2Remaining -= 1
             if self.phase2Remaining == 0:
                 self.state = self.states[3]
-                ##  Termina o processo  ##
-                ##  Retorna?            ## 
-                pass
-            
-        #Verifica em qual estado está
-            #Subtrai o estado que esta
-        #Se o processo estava em phase1 e igualou a zero
-            #Bloqueia o processo
-            #Coloca em Vetor de IO
-        #Se o processo estava em io e igualou a zero
-            #Desbloqueia o processo
-                #Tira do Vetor de IO
-            #Coloca em auxiliarQueue
-        #Se o processo estava em phase2 e igualou a zero
-            #Muda estado para terminado
+                return "ended"
+            return "execute"
+                ##  Termina o process  ##
