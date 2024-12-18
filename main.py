@@ -9,7 +9,7 @@ t = 0
 auxiliarQueue = []
 readyQueue = []
 newQueue = []
-memory = [0] * 32768 
+memory = Memory(32768, 128)
 cpus = [Cpu(1), Cpu(2), Cpu(3), Cpu(4)]
 
 
