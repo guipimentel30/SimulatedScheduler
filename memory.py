@@ -24,7 +24,7 @@ class Memory():
 
     #   O método processAlocation simula a alocação de um processo na memória   #
     def processAlocation(self, process):
-        processSize  = process.size #Guarda  
+        processSize  = process.size #Guarda o tamanho do processo  
         allocatedBytes = 0  #Guarda o número de MB alocados
         addresses = []  #Guarda o índice das páginas usadas
         #   Andamos pelo memoryVector verificando se a página está ocupada      #
@@ -36,9 +36,9 @@ class Memory():
                 #   Diminuimos o número de páginas livres na memória            #
                 self.freePages -= 1
                 #   Percorremos o vetor (página):                               # 
-                for j in self.memoryVector[i]:
+                for j in range(len(self.memoryVector[i])):
                     #   Simulamos um MB ocupado substituindo o 0 por 1          #
-                    j = 1   
+                    self.memoryVector[i][j] = 1   
                     #   Aumentamos o número de MB alocados                      #
                     allocatedBytes += 1
                     #   Ao alocar MB equivalentes ao tamanho do processo, saimos#
@@ -60,4 +60,3 @@ class Memory():
             self.memoryVector[i] = [0*self.pageSize]* self.pageSize
             #   Incrementamos o número de páginas livres                        #
             self.freePages += 1
-
