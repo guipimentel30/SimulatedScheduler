@@ -5,7 +5,7 @@ from processTable import ProcessTable
 from geradoraDeProcessos import GeradoraDeProcessos
 from memory import Memory
 
-id = 0
+id = 0  #Variável que controla o identificador dos processos
 t = 0   #Representa a unidade de tempo
 pageSize = 128   #Constante do tamanho da página
 memorySize = 32768   #Constante do tamanho da memória
@@ -29,14 +29,13 @@ while(True):
 
     #   A thread Geradora de processs gera de zero a três processs aleatórios #
     #   e os aloca na fila de processs novos                                   #
-    if t ==0: 
-        id = GeradoraDeProcessos.generateProcess(newQueue, id) 
+    id = GeradoraDeProcessos.generateProcess(newQueue, id) 
 
     #   Para cada process na fila de processs novos                           #
     for process in newQueue[:]:
     #   Verifica  possibilidade de alocação na memória: process.aloca(memory)  #
         if memory.verifySpace(process):
-            process.table = memory.processAlocation(process) # FALTA USAR PROCESS TABLE!!!!!!!!!! #
+            process.table = memory.processAlocation(process)
             readyQueue.append(process)  # Insere o processo na fila de prontos #                                   
             process.newToReady()    # Processo muda de estado #                                        
             newQueue.remove(process)     
@@ -50,5 +49,5 @@ while(True):
     #Imprimimos as informações atuais                                           #
     
     print("\n")
-    if t == 30:
+    if t == 40:
         break

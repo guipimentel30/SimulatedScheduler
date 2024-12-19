@@ -1,24 +1,30 @@
-class Process():                                                                                     
+class Process():   
+    #   O método construtor:                                                    #
     def __init__(self, id, cpuPhase1, io, cpuPhase2, size):
-        self.id = id
-        self.size = size
-        self.state = self.states[0]
+        self.id = id    #Guarda o identificador do processo,
+        self.size = size    #Guarda o tamanho do processo
+        #   Todo processo é inicializado no estado novo.                        #
+        self.state = self.states[0] #Guarda o estado atual do processo
 
-        self.cpuPhase1 = cpuPhase1
-        self.io = io
-        self.cpuPhase2 = cpuPhase2
+        self.cpuPhase1 = cpuPhase1  #Guarda a duração da primeira fase de CPU
+        self.io = io    #Guarda a duração da fase de IO
+        self.cpuPhase2 = cpuPhase2  #Guarda a duração da segunda fase de CPU
 
-        self.phase1Remaining = cpuPhase1
-        self.ioRemaining = io
-        self.phase2Remaining = cpuPhase2
+        self.phase1Remaining = cpuPhase1    #Guarda quanto tempo falta para finalizar a Fase 1
+        self.ioRemaining = io   #Guarda quanto tempo falta para finalizar a Fase IO
+        self.phase2Remaining = cpuPhase2    #Guarda quanto tempo falta para finalizar a Fase 2
         
-    table = None
-        
+    table = None    #Variável que guarda o objeto processTable de um processo.
+    #   Lista de possíveis estados.                                             #
     states = ["novo", "pronto", "executando", "terminado", "bloqueado"]
 
+    #   Métodos responsáveis por apontar a mudança de estado de um processo.    #
     def newToReady(self):
+        #   Atualizamos a variável de estado.                                   #
         self.state = self.states[1]
+        #   Imprimimos um aviso da mudança.                                     #
         print(f'Processo {self.id}: de novo para pronto')
+        #   Imprimimos o tempo restante das fases do processo.                  #
         print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
         
     def readyToRunning(self):
@@ -51,48 +57,67 @@ class Process():
         print(f'Processo {self.id}: de executando para terminado')
         print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
+    #   O método processRun atualiza os valores de um processo para simular     # 
+    #   a passagem de tempo. Ele recebe como parâmetro a memória,               #
+    #   a fila de prontos auxiliar e a lista de processos em IO.                #
     def processRun(self, auxiliarQueue, ioProcesses, memory):
-        #  Se a fase 1 não foi terminada:   # 
+        #  Se o processo ainda está na Fase 1:                                  # 
         if self.phase1Remaining != 0:
+            #   Decrementamos o tempo restante da fase.                         #
             self.phase1Remaining -= 1
+            #   Caso a fase acabe:                                              #
             if self.phase1Remaining == 0:
-                #  Se possui uma fase IO:   # 
+                #   Verificamos se o processo possui fase de IO                 # 
                 if self.ioRemaining != 0:
+                    #   Alteramos o estado de executando para bloqueado         #
                     self.runningToBlocked()
+                    #   Anexamos o processo na lista de processos em IO         #
                     ioProcesses.append(self)
                     return "block"
-                    ##  Retorna?            ## 
-                #  Se não possui mais fases: #    
+                #  Caso o processo não possua nem fase de IO nem fase 2:        #    
                 elif self.phase2Remaining == 0:
+                    #   Alteramos o estado de executando para terminado         #
                     self.runningToEnd()
+                    # Chamamos um método para desalocar a memória do processo   #
                     memory.processDeallocation(self)
                     return "ended"
-                    ##  Termina o process  ##
+            #   Caso o processo ainda possua fases de CPU, seguimos.            #
             return "execute"
 
-        #  Se a fase IO não foi terminada:  # 
+        #  Se o processo está na Fase IO:                                       # 
         elif self.ioRemaining != 0:
+            #   Decrementamos o tempo restante da fase.                         #
             self.ioRemaining -= 1
+            #   Caso a fase acabe:                                              #
             if self.ioRemaining == 0:
-                #  Se possui uma fase 2:     #
+                #   Verificamos se o processo possui fase 2.                    # 
                 if self.phase2Remaining != 0:
+                    #   Alteramos o estado de bloqueado para pronto             #
                     self.blockedToReady()
-                    ioProcesses.remove(self) #?
+                    #   Removemos o processo da lista de processos em IO        #
+                    ioProcesses.remove(self)
+                    #   Anexamos o processo a fila auxiliar de prontos          # 
                     auxiliarQueue.append(self)
-                    return "execute"
-                #  Se não possui uma fase 2: #
+                    return "ready"
+                #  Caso o processo não possua mais fases:                       #
                 else:
+                    #   Alteramos o estado de bloqueado para terminado          #
                     self.blockedToEnd()
-                    ##  Termina o process  ##
+                    # Chamamos um método para desalocar a memória do processo   #
                     memory.processDeallocation(self)
                     return "ended"
             return "blocked"
-        #  Se a fase 2 não foi terminada:   #
+            
+        #  Se o processo está na Fase 2:                                        #
         else:
+            #   Decrementamos o tempo restante da fase.                         #
             self.phase2Remaining -= 1
+            #   Caso a fase acabe:                                              #
             if self.phase2Remaining == 0:
+                #   Alteramos o estado de executando para terminado             #
                 self.runningToEnd()
+                # Chamamos um método para desalocar a memória do processo       #
                 memory.processDeallocation(self)
                 return "ended"
+            #   Caso o processo ainda possua fases de CPU, seguimos.            #
             return "execute"
-                ##  Termina o process  ##
