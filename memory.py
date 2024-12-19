@@ -1,15 +1,17 @@
 from processTable import ProcessTable
+from math import ceil
+
 class Memory():
     def __init__(self, memorySize, pageSize):
         self.pageSize = pageSize
         self.memorySize = memorySize
-        self.freePages = memorySize / pageSize
-        self.memoryVector = [[]* self.pageSize for _ in range(self.freePages)]
-
+        self.freePages = ceil(memorySize / pageSize)
+        self.memoryVector = [[0*pageSize]* self.pageSize for _ in range(self.freePages)]
 
     # Verifica se há páginas vazias na memória #
-    def verifySpace(self, numberOfPages):
-        if self.freePages <= numberOfPages:
+    def verifySpace(self, process):
+        numberOfPages = ceil(process.size / self.pageSize)
+        if self.freePages >= numberOfPages:
             return True
         else:
             return False
@@ -20,12 +22,11 @@ class Memory():
         processSize  = process.size 
         allocatedBytes = 0
         addresses = []
-
-        for i in range(i, len(self.memoryVector)):
+        for i in range(len(self.memoryVector)):
             if (self.memoryVector[i][0] == 0):
                 addresses.append(i)
                 self.freePages -= 1
-                for j in i:
+                for j in self.memoryVector[i]:
                     j = 1
                     allocatedBytes += 1
                     if (allocatedBytes == processSize):

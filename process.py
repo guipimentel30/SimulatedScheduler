@@ -17,26 +17,37 @@ class Process():
     def newToReady(self):
         self.state = self.states[1]
         print(f'Processo {self.id}: de novo para pronto')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
         
     def readyToRunning(self):
         self.state = self.states[2]
         print(f'Processo {self.id}: de pronto para executando')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
     def runningToBlocked(self):
         self.state = self.states[4]
         print(f'Processo {self.id}: de executando para bloqueado')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
     def runningToReady(self):
         self.state = self.states[1]
         print(f'Processo {self.id}: de executando para pronto')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
     def blockedToReady(self):
         self.state = self.states[1]
         print(f'Processo {self.id}: de bloqueado para pronto')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        
+    def blockedToEnd(self):
+        self.state = self.states[1]
+        print(f'Processo {self.id}: de bloqueado para terminado')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
     def runningToEnd(self):
         self.state = self.states[3]
         print(f'Processo {self.id}: de executando para terminado')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
     def processRun(self, auxiliarQueue, ioProcesses):
         #  Se a fase 1 não foi terminada:   # 
@@ -45,13 +56,13 @@ class Process():
             if self.phase1Remaining == 0:
                 #  Se possui uma fase IO:   # 
                 if self.ioRemaining != 0:
-                    self.state = self.states[4]
+                    self.runningToBlocked()
                     ioProcesses.append(self)
                     return "block"
                     ##  Retorna?            ## 
                 #  Se não possui mais fases: #    
                 elif self.phase2Remaining == 0:
-                    self.state = self.states[3]
+                    self.runningToEnd()
                     return "ended"
                     ##  Termina o process  ##
             return "execute"
@@ -62,13 +73,13 @@ class Process():
             if self.ioRemaining == 0:
                 #  Se possui uma fase 2:     #
                 if self.phase2Remaining != 0:
-                    self.state = self.states[1]
+                    self.blockedToReady()
                     ioProcesses.remove(self) #?
                     auxiliarQueue.append(self)
                     return "execute"
                 #  Se não possui uma fase 2: #
                 else:
-                    self.state = self.states[3]
+                    self.blockedToEnd()
                     ##  Termina o process  ##
                     return "ended"
             return "blocked"
@@ -76,7 +87,7 @@ class Process():
         else:
             self.phase2Remaining -= 1
             if self.phase2Remaining == 0:
-                self.state = self.states[3]
+                self.runningToEnd()
                 return "ended"
             return "execute"
                 ##  Termina o process  ##

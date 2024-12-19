@@ -1,6 +1,6 @@
 class Despachante():
 
-    def despachar(self, auxiliarQueue, readyQueue, cpus):
+    def despachar(auxiliarQueue, readyQueue, cpus):
         for cpu in cpus:
             if cpu.process == None:
                 if len(auxiliarQueue) > 0:
