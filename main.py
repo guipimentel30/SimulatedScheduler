@@ -18,7 +18,7 @@ memory = Memory(memorySize, pageSize)  #Representação da memória principal
 cpus = [Cpu(1), Cpu(2), Cpu(3), Cpu(4)]   #Vetor com as 4 CPUs
 
 while(True):
-    print(f'T = {t}') 
+    print(f'-------------------- T = {t} --------------------\n') 
     
     #   Para todas as CPUs, executamos os processs alocados nelas: cpus[i].run #
     #   Executamos todos os processs na fase de IO: ioProcesses[i].processRun  #    
@@ -47,7 +47,16 @@ while(True):
     t += 1
     
     #Imprimimos as informações atuais                                           #
-    
     print("\n")
+    print(f'Memória: {memory.freePages} páginas')
+    #print(f'Fila de novos: {newQueue}')
+    #print(f'Fila de prontos: {readyQueue}')
+    #print(f'Fila auxiliar: {auxiliarQueue}')
+    #print(f'Processos bloqueados: {ioProcesses}')
+    for cpu in cpus:
+        if cpu.process:
+            print(f'CPU {cpu.name}: executando processo {cpu.process.id}')
+    print("\n")
+    
     if t == 40:
         break
