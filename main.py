@@ -23,9 +23,9 @@ while(True):
     #   Para todas as CPUs, executamos os processs alocados nelas: cpus[i].run #
     #   Executamos todos os processs na fase de IO: ioProcesses[i].processRun  #    
     for i in ioProcesses:
-        i.processRun(auxiliarQueue, ioProcesses)    
+        i.processRun(auxiliarQueue, ioProcesses, memory)    
     for i in cpus:
-        i.run(readyQueue, auxiliarQueue, ioProcesses)
+        i.run(readyQueue, auxiliarQueue, ioProcesses, memory)
 
     #   A thread Geradora de processs gera de zero a três processs aleatórios #
     #   e os aloca na fila de processs novos                                   #
@@ -36,7 +36,7 @@ while(True):
     for process in newQueue[:]:
     #   Verifica  possibilidade de alocação na memória: process.aloca(memory)  #
         if memory.verifySpace(process):
-            processTable = memory.processAlocation(process) # FALTA USAR PROCESS TABLE!!!!!!!!!! #
+            process.table = memory.processAlocation(process) # FALTA USAR PROCESS TABLE!!!!!!!!!! #
             readyQueue.append(process)  # Insere o processo na fila de prontos #                                   
             process.newToReady()    # Processo muda de estado #                                        
             newQueue.remove(process)     

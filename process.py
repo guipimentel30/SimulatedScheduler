@@ -12,6 +12,8 @@ class Process():
         self.ioRemaining = io
         self.phase2Remaining = cpuPhase2
         
+    table = None
+        
     states = ["novo", "pronto", "executando", "terminado", "bloqueado"]
 
     def newToReady(self):
@@ -49,7 +51,7 @@ class Process():
         print(f'Processo {self.id}: de executando para terminado')
         print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
 
-    def processRun(self, auxiliarQueue, ioProcesses):
+    def processRun(self, auxiliarQueue, ioProcesses, memory):
         #  Se a fase 1 não foi terminada:   # 
         if self.phase1Remaining != 0:
             self.phase1Remaining -= 1
@@ -63,6 +65,7 @@ class Process():
                 #  Se não possui mais fases: #    
                 elif self.phase2Remaining == 0:
                     self.runningToEnd()
+                    memory.processDeallocation(self)
                     return "ended"
                     ##  Termina o process  ##
             return "execute"
@@ -81,6 +84,7 @@ class Process():
                 else:
                     self.blockedToEnd()
                     ##  Termina o process  ##
+                    memory.processDeallocation(self)
                     return "ended"
             return "blocked"
         #  Se a fase 2 não foi terminada:   #
@@ -88,6 +92,7 @@ class Process():
             self.phase2Remaining -= 1
             if self.phase2Remaining == 0:
                 self.runningToEnd()
+                memory.processDeallocation(self)
                 return "ended"
             return "execute"
                 ##  Termina o process  ##

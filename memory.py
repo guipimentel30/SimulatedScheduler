@@ -37,4 +37,8 @@ class Memory():
         processTable = ProcessTable(process, self.pageSize, addresses)
         return processTable
 
+    def processDeallocation(self, process):
+        for i in process.table.table:
+            self.memoryVector[i] = [0*self.pageSize]* self.pageSize
+            self.freePages += 1
 
