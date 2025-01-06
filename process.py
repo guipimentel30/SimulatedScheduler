@@ -25,37 +25,37 @@ class Process():
         #   Imprimimos um aviso da mudança.                                     #
         print(f'Processo {self.id}: de novo para pronto')
         #   Imprimimos o tempo restante das fases do processo.                  #
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
         
     def readyToRunning(self):
         self.state = self.states[2]
         print(f'Processo {self.id}: de pronto para executando')
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
 
     def runningToBlocked(self):
         self.state = self.states[4]
         print(f'Processo {self.id}: de executando para bloqueado')
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
 
     def runningToReady(self):
         self.state = self.states[1]
         print(f'Processo {self.id}: de executando para pronto')
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
 
     def blockedToReady(self):
         self.state = self.states[1]
         print(f'Processo {self.id}: de bloqueado para pronto')
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
         
     def blockedToEnd(self):
         self.state = self.states[1]
         print(f'Processo {self.id}: de bloqueado para terminado')
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
 
     def runningToEnd(self):
         self.state = self.states[3]
         print(f'Processo {self.id}: de executando para terminado')
-        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}')
+        print(f'Fase1 = {self.phase1Remaining}\nFaseIO = {self.ioRemaining}\nFase2 = {self.phase2Remaining}\n')
 
     #   O método processRun atualiza os valores de um processo para simular     # 
     #   a passagem de tempo. Ele recebe como parâmetro a memória,               #
@@ -103,6 +103,8 @@ class Process():
                 else:
                     #   Alteramos o estado de bloqueado para terminado          #
                     self.blockedToEnd()
+                    #   Removemos o processo da lista de processos em IO        #
+                    ioProcesses.remove(self)
                     # Chamamos um método para desalocar a memória do processo   #
                     memory.processDeallocation(self)
                     return "ended"

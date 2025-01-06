@@ -29,7 +29,8 @@ while(True):
 
     #   A thread Geradora de processs gera de zero a três processs aleatórios #
     #   e os aloca na fila de processs novos                                   #
-    id = GeradoraDeProcessos.generateProcess(newQueue, id) 
+    if t<45:
+        id = GeradoraDeProcessos.generateProcess(newQueue, id) 
 
     #   Para cada process na fila de processs novos                           #
     for process in newQueue[:]:
@@ -47,16 +48,46 @@ while(True):
     t += 1
     
     #Imprimimos as informações atuais                                           #
-    print("\n")
-    print(f'Memória: {memory.freePages} páginas')
-    #print(f'Fila de novos: {newQueue}')
-    #print(f'Fila de prontos: {readyQueue}')
-    #print(f'Fila auxiliar: {auxiliarQueue}')
-    #print(f'Processos bloqueados: {ioProcesses}')
+    print(f'Memória: {memory.freePages} páginas livres\n')
+    
     for cpu in cpus:
         if cpu.process:
             print(f'CPU {cpu.name}: executando processo {cpu.process.id}')
+        else:
+            print(f'CPU {cpu.name}: vazia')
+    
+    print(f'\nFila de novos: ', end="")
+    for n in range(len(newQueue)):
+        if n != (len(newQueue)-1):
+            print(f'Processo {newQueue[n].id}', end=", ")
+        else:
+            print(f'Processo {newQueue[n].id}', end="")
     print("\n")
     
-    if t == 40:
+    print(f'Fila de prontos: ', end="")
+    for r in range(len(readyQueue)):
+        if r != (len(readyQueue)-1):
+            print(f'Processo {readyQueue[r].id}', end=", ")
+        else:
+            print(f'Processo {readyQueue[r].id}', end="")
+    print("\n")
+    
+    print(f'Fila auxiliar: ', end="")
+    for a in range(len(auxiliarQueue)):
+        if a != (len(auxiliarQueue)-1):
+            print(f'Processo {auxiliarQueue[a].id}', end=", ")
+        else:
+            print(f'Processo {auxiliarQueue[a].id}', end="")
+    print("\n")
+    
+    print(f'Processos bloqueados: ', end="")
+    for i in range(len(ioProcesses)):
+        if i != (len(ioProcesses)-1):
+            print(f'Processo {ioProcesses[i].id}', end=", ")
+        else:
+            print(f'Processo {ioProcesses[i].id}', end="")
+    print("\n")
+    
+    if t == 200:
+        print("-------------------------------------------------\n") 
         break
