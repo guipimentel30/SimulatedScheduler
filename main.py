@@ -4,6 +4,7 @@ from despachante import Despachante
 from processTable import ProcessTable
 from geradoraDeProcessos import GeradoraDeProcessos
 from memory import Memory
+import threading
 
 id = 0  #Variável que controla o identificador dos processos
 t = 0   #Representa a unidade de tempo
@@ -17,6 +18,12 @@ ioProcesses = []   #Vetor com os processos na fase de IO
 memory = Memory(memorySize, pageSize)  #Representação da memória principal
 cpus = [Cpu(1), Cpu(2), Cpu(3), Cpu(4)]   #Vetor com as 4 CPUs
 
+threadGeradoraDeProcessos = threading.Thread(target=GeradoraDeProcessos.generateProcess, args=(newQueue, id)) #Thread que gera processos
+threadGeradoraDeProcessos.start() #Inicia a thread
+
+threadDespachante = threading.Thread(target=Despachante.despachar, args=(auxiliarQueue, readyQueue, cpus)) #Thread que despacha processos
+threadDespachante.start() #Inicia a thread
+
 while(True):
     print(f'-------------------- T = {t} --------------------\n') 
     
@@ -29,6 +36,7 @@ while(True):
 
     #   A thread Geradora de processs gera de zero a três processs aleatórios #
     #   e os aloca na fila de processs novos                                   #
+
     if t<45:
         id = GeradoraDeProcessos.generateProcess(newQueue, id) 
 
@@ -91,3 +99,6 @@ while(True):
     if t == 200:
         print("-------------------------------------------------\n") 
         break
+
+threadDespachante.join() #Espera a thread despachante terminar
+threadGeradoraDeProcessos.join() #Espera a thread geradora de processos terminar
