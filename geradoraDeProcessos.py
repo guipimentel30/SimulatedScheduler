@@ -6,7 +6,7 @@ class GeradoraDeProcessos():
     def generateProcess(newQueue, id):
         #   Existe uma chance de 60% do método generateProcess não gerar processos.                     #
         chance = random.randint(1, 5)
-        if ((chance >= 4) or (id == 0)):
+        if ((chance >= 4) or (id == 1)):
             #   O método gera de 1 a 3 processos.                                                       #
             numberOfProcesses = random.randint(1, 3)
             #   Para cada processo gerado, se cria informações aleatórias.                              #

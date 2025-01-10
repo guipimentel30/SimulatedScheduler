@@ -37,8 +37,8 @@ class Memory():
                 self.freePages -= 1
                 #   Percorremos o vetor (página):                               # 
                 for j in range(len(self.memoryVector[i])):
-                    #   Simulamos um MB ocupado substituindo o 0 por 1          #
-                    self.memoryVector[i][j] = 1   
+                    #   Simulamos um MB ocupado substituindo o 0 pelo ID do P   #
+                    self.memoryVector[i][j] = (process.id)   
                     #   Aumentamos o número de MB alocados                      #
                     allocatedBytes += 1
                     #   Ao alocar MB equivalentes ao tamanho do processo, saimos#
@@ -60,3 +60,17 @@ class Memory():
             self.memoryVector[i] = [0*self.pageSize]* self.pageSize
             #   Incrementamos o número de páginas livres                        #
             self.freePages += 1
+
+    def printMemory(self):
+        for i in range(len(self.memoryVector)):
+            print(self.memoryVector[i][0])
+        for i in range(len(self.memoryVector)):
+            if self.memoryVector[i][0] != 0:
+                print(f'Quadro {i} ocupado pelo Processo {self.memoryVector[i][0]}')
+            else:
+                print(f'Quadro {i} desocupado')
+
+    def printUsedMemory(self):
+        for i in range(len(self.memoryVector)):
+            if self.memoryVector[i][0] != 0:
+                print(f'Quadro {i} ocupado pelo Processo {self.memoryVector[i][0]}')

@@ -6,8 +6,12 @@ from geradoraDeProcessos import GeradoraDeProcessos
 from memory import Memory
 import threading
 
-id = 0  #Variável que controla o identificador dos processos
+id = 1  #Variável que controla o identificador dos processos
+
 t = 0   #Representa a unidade de tempo
+parada = 0 #Representa quantas unidades de tempo serão representadas
+alt = 0 #Representa até quando processos aleatórios devem ser gerados
+
 pageSize = 128   #Constante do tamanho da página
 memorySize = 32768   #Constante do tamanho da memória
 
@@ -18,11 +22,8 @@ ioProcesses = []   #Vetor com os processos na fase de IO
 memory = Memory(memorySize, pageSize)  #Representação da memória principal
 cpus = [Cpu(1), Cpu(2), Cpu(3), Cpu(4)]   #Vetor com as 4 CPUs
 
-threadGeradoraDeProcessos = threading.Thread(target=GeradoraDeProcessos.generateProcess, args=(newQueue, id)) #Thread que gera processos
-threadGeradoraDeProcessos.start() #Inicia a thread
-
-threadDespachante = threading.Thread(target=Despachante.despachar, args=(auxiliarQueue, readyQueue, cpus)) #Thread que despacha processos
-threadDespachante.start() #Inicia a thread
+parada = int(input("Insira quantas unidades de tempo vocês deseja simular: "))
+alt = int(input("Insira até que unidade de tempo serão gerados processos aleatórios: "))
 
 while(True):
     print(f'-------------------- T = {t} --------------------\n') 
@@ -36,8 +37,7 @@ while(True):
 
     #   A thread Geradora de processs gera de zero a três processs aleatórios #
     #   e os aloca na fila de processs novos                                   #
-
-    if t<45:
+    if t<=alt:
         id = GeradoraDeProcessos.generateProcess(newQueue, id) 
 
     #   Para cada process na fila de processs novos                           #
@@ -96,9 +96,10 @@ while(True):
             print(f'Processo {ioProcesses[i].id}', end="")
     print("\n")
     
-    if t == 200:
+    if t > parada:
         print("-------------------------------------------------\n") 
-        break
-
-threadDespachante.join() #Espera a thread despachante terminar
-threadGeradoraDeProcessos.join() #Espera a thread geradora de processos terminar
+        parada += int(input("Insira quantas unidades de tempo vocês deseja simular: "))
+        print("\n")
+        
+        if t > parada: 
+            break
