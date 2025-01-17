@@ -38,7 +38,7 @@ despachanteOk = threading.Event()
 executaPrincipal = threading.Event() 
 executaPrincipal.set() 
 
-lock = threading.Lock() 
+lock = threading.Lock()  # Garante o acesso exclusivo às variáveis globais, listas e outros recursos, evitando condição de corrida e imprevisibilidades
 
 
 def thread_geradora():
@@ -47,7 +47,7 @@ def thread_geradora():
         geradoraGo.wait() # Espera sinal para começar sua função
         if not executaPrincipal.is_set():  # Checa se deve começar a gerar processos
             break
-        with lock: # Garante o acesso exclusivo às variáveis globais e listas, evitando condição de corrida e imprevisibilidades
+        with lock:
             print("GEREI-----------------------------")
             id = GeradoraDeProcessos.generateProcess(newQueue, id) # Gera processos aleatórios e os aloca na fila de processos novos
 
@@ -61,7 +61,7 @@ def thread_despachante():
         despachanteGo.wait() # Garante o acesso exclusivo às variáveis globais e listas, evitando condição de corrida e imprevisibilidades
         if not executaPrincipal.is_set():  # Checa se realmente deve começar a despachar
             break
-        with lock: # O lock garante que não ocorram inconsistências no acesso de leitura e escrita das variáveis globais e listas
+        with lock:
             print("ENTREI DESPACHANDO----------")
             Despachante.despachar(auxiliarQueue, readyQueue, cpus)
 
@@ -72,35 +72,40 @@ def thread_despachante():
 
 def principal():
     global t, parada, alt
-    while executaPrincipal.is_set():
+    while executaPrincipal.is_set(): # Loop principal enquanto o programa estiver ativo
         with lock:
             print(f'-------------------- T = {t} --------------------\n') 
             print(f'Memória: {memory.freePages} páginas livres\n')
+
             #   Para todas as CPUs, executamos os processs alocados nelas: cpus[i].run #
             #   Executamos todos os processs na fase de IO: ioProcesses[i].processRun  #    
             for i in ioProcesses:
                 i.processRun(auxiliarQueue, ioProcesses, memory)    
             for i in cpus:
                 i.run(readyQueue, auxiliarQueue, ioProcesses, memory)
-                
-        if t <= alt and t != 0: # Gera processos aleatórios apenas até o tempo limite
+
+
+
+        #   A thread Geradora de processs gera de zero a três processs aleatórios #
+        #   e os aloca na fila de processs novos                                  #    
+        if t <= alt and t != 0: 
             geradoraOk.clear() #Reseta o sinal de feito, preparando para o próximo ciclo de execução.
             geradoraGo.set() #Sinaliza que o gerador pode iniciar o próximo ciclo de criação de processos.
             geradoraOk.wait() #Principal espera o OK da geradora para continuar.
 
         for process in newQueue[:]:
-            #   Verifica  possibilidade de alocação na memória: process.aloca(memory)  #
+            #   Verifica  possibilidade de alocação na memória: process.aloca(memory)  #1
             if memory.verifySpace(process):
                 process.table = memory.processAlocation(process)
                 readyQueue.append(process)  # Insere o processo na fila de prontos #                                   
                 process.newToReady()    # Processo muda de estado #                                        
                 newQueue.remove(process) 
-        
+
         despachanteOk.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
         despachanteGo.set() #Sinaliza que o despachante pode despachar os processos.
         despachanteOk.wait() #Principal espera o OK da despechante para continuar.
         
-        #Imprimimos as informações atuais                                           #
+        #          Imprime as informações do estado atual das filas e CPUs             #
         with lock:
             for cpu in cpus:
                 if cpu.process:
@@ -142,15 +147,15 @@ def principal():
                     print(f'Processo {ioProcesses[i].id}', end="")
             print("\n")
         
-            t += 1
+            t += 1 # Incrementa o tempo
         
         if t > parada:
             print("-------------------------------------------------\n") 
             parada += int(input("Insira quantas unidades de tempo vocês deseja simular: "))
             print("\n")
             
-        if t > parada: 
-            executaPrincipal.clear() 
+        if t > parada: # Finaliza o programa se o tempo limite foi alcançado e não deseja-se continuar
+            executaPrincipal.clear() # Indica que o programa principal deve parar
             print("Finalizando programa.")
             break
 
@@ -158,18 +163,19 @@ def principal():
 
 
 
-threadDespachante = threading.Thread(target=thread_despachante, name="Despachante", daemon=True)
-threadDespachante.start()
+threadDespachante = threading.Thread(target=thread_despachante, name="Despachante")
+threadDespachante.start() # Inicia a thread despachante
 
 
-threadGeradora = threading.Thread(target=thread_geradora, name="Geradora", daemon=True)
-threadGeradora.start()
+threadGeradora = threading.Thread(target=thread_geradora, name="Geradora")
+threadGeradora.start() # Inicia a thread geradora
 
 
-threadPrincipal = threading.Thread(target=principal, name="Principal", daemon=False)
-threadPrincipal.start()
+threadPrincipal = threading.Thread(target=principal, name="Principal")
+threadPrincipal.start() # Inicia a thread principal
 
-threadDespachante.join() 
-threadPrincipal.join() 
-threadGeradora.join()
+threadDespachante.join()  # Aguarda a thread despachante terminar
+threadPrincipal.join()  # Aguarda a thread principal terminar
+threadGeradora.join()  # Aguarda a thread geradora terminar
 print("Programa encerrado.")
+
