@@ -42,51 +42,37 @@ lock = threading.Lock()
 
 
 def thread_geradora():
-    global id, t, alt
+    global id, t, alt, newQueue
     while executaPrincipal.is_set(): # Roda enquanto o programa não é encerrado pelo usuário
         geradoraGo.wait() # Espera sinal para começar sua função
+        if not executaPrincipal.is_set():  # Checa se deve começar a gerar processos
+            break
         with lock: # Garante o acesso exclusivo às variáveis globais e listas, evitando condição de corrida e imprevisibilidades
-            if t <= alt: # Gera processos aleatórios apenas até o tempo limite
-                id = GeradoraDeProcessos.generateProcess(newQueue, id) # Gera processos aleatórios e os aloca na fila de processos novos
-
-                #Funcionamento decente depende desse timeSleep
-
-                time.sleep(1.5) # Espera para gerar novo processo
+            print("GEREI-----------------------------")
+            id = GeradoraDeProcessos.generateProcess(newQueue, id) # Gera processos aleatórios e os aloca na fila de processos novos
 
         geradoraOk.set() # Indica para a principal que ação foi concluída, e ela pode voltar à sua função
+        geradoraGo.clear()  # Reseta o próprio sinal, preparando para o próximo ciclo de execução.
 
 
 def thread_despachante():
     global t
     while executaPrincipal.is_set(): # Roda enquanto o programa não é encerrado pelo usuário
         despachanteGo.wait() # Garante o acesso exclusivo às variáveis globais e listas, evitando condição de corrida e imprevisibilidades
+        if not executaPrincipal.is_set():  # Checa se realmente deve começar a despachar
+            break
         with lock: # O lock garante que não ocorram inconsistências no acesso de leitura e escrita das variáveis globais e listas
+            print("ENTREI DESPACHANDO----------")
             Despachante.despachar(auxiliarQueue, readyQueue, cpus)
+
         despachanteOk.set() #Indica que o despachante já concluiu sua ação
+        despachanteGo.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
+
 
 
 def principal():
     global t, parada, alt
     while executaPrincipal.is_set():
-
-        geradoraGo.set() #Sinaliza que o gerador pode iniciar o próximo ciclo de criação de processos.
-        geradoraOk.wait() #Principal espera o OK da geradora para continuar.
-        geradoraGo.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
-        geradoraOk.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
-
-        for process in newQueue[:]:
-            #   Verifica  possibilidade de alocação na memória: process.aloca(memory)  #
-                if memory.verifySpace(process):
-                    process.table = memory.processAlocation(process)
-                    readyQueue.append(process)  # Insere o processo na fila de prontos #                                   
-                    process.newToReady()    # Processo muda de estado #                                        
-                    newQueue.remove(process) 
-
-        despachanteGo.set() #Sinaliza que o despachante pode despachar os processos.
-        despachanteOk.wait() #Principal espera o OK da geradora para continuar.
-        despachanteGo.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
-        despachanteOk.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
-        
         with lock:
             print(f'-------------------- T = {t} --------------------\n') 
             print(f'Memória: {memory.freePages} páginas livres\n')
@@ -96,7 +82,24 @@ def principal():
                 i.processRun(auxiliarQueue, ioProcesses, memory)    
             for i in cpus:
                 i.run(readyQueue, auxiliarQueue, ioProcesses, memory)
+                
+        if t <= alt and t != 0: # Gera processos aleatórios apenas até o tempo limite
+            geradoraOk.clear() #Reseta o sinal de feito, preparando para o próximo ciclo de execução.
+            geradoraGo.set() #Sinaliza que o gerador pode iniciar o próximo ciclo de criação de processos.
+            geradoraOk.wait() #Principal espera o OK da geradora para continuar.
 
+        for process in newQueue[:]:
+            #   Verifica  possibilidade de alocação na memória: process.aloca(memory)  #
+            if memory.verifySpace(process):
+                process.table = memory.processAlocation(process)
+                readyQueue.append(process)  # Insere o processo na fila de prontos #                                   
+                process.newToReady()    # Processo muda de estado #                                        
+                newQueue.remove(process) 
+        
+        despachanteOk.clear() #Reseta o sinal, preparando para o próximo ciclo de execução.
+        despachanteGo.set() #Sinaliza que o despachante pode despachar os processos.
+        despachanteOk.wait() #Principal espera o OK da despechante para continuar.
+        
         #Imprimimos as informações atuais                                           #
         with lock:
             for cpu in cpus:
@@ -115,7 +118,6 @@ def principal():
                     print(f'Processo {newQueue[n].id}', end="")
             print("\n")
         
-        with lock:
             print(f'Fila de prontos: ', end="")
             for r in range(len(readyQueue)):
                 if r != (len(readyQueue)-1):
@@ -124,7 +126,6 @@ def principal():
                     print(f'Processo {readyQueue[r].id}', end="")
             print("\n")
         
-        with lock:
             print(f'Fila auxiliar: ', end="")
             for a in range(len(auxiliarQueue)):
                 if a != (len(auxiliarQueue)-1):
@@ -133,7 +134,6 @@ def principal():
                     print(f'Processo {auxiliarQueue[a].id}', end="")
             print("\n")
         
-        with lock:
             print(f'Processos bloqueados: ', end="")
             for i in range(len(ioProcesses)):
                 if i != (len(ioProcesses)-1):
@@ -142,7 +142,6 @@ def principal():
                     print(f'Processo {ioProcesses[i].id}', end="")
             print("\n")
         
-        with lock: 
             t += 1
         
         if t > parada:
@@ -151,7 +150,7 @@ def principal():
             print("\n")
             
         if t > parada: 
-            executaPrincipal.clear() # Seta o evento para 0
+            executaPrincipal.clear() 
             print("Finalizando programa.")
             break
 
