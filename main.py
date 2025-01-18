@@ -48,7 +48,6 @@ def thread_geradora():
         if not executaPrincipal.is_set():  # Checa se deve começar a gerar processos
             break
         with lock:
-            print("GEREI-----------------------------")
             id = GeradoraDeProcessos.generateProcess(newQueue, id) # Gera processos aleatórios e os aloca na fila de processos novos
 
         geradoraOk.set() # Indica para a principal que ação foi concluída, e ela pode voltar à sua função
@@ -62,7 +61,6 @@ def thread_despachante():
         if not executaPrincipal.is_set():  # Checa se realmente deve começar a despachar
             break
         with lock:
-            print("ENTREI DESPACHANDO----------")
             Despachante.despachar(auxiliarQueue, readyQueue, cpus)
 
         despachanteOk.set() #Indica que o despachante já concluiu sua ação
@@ -88,7 +86,7 @@ def principal():
 
         #   A thread Geradora de processs gera de zero a três processs aleatórios #
         #   e os aloca na fila de processs novos                                  #    
-        if t <= alt and t != 0: 
+        if t <= alt: 
             geradoraOk.clear() #Reseta o sinal de feito, preparando para o próximo ciclo de execução.
             geradoraGo.set() #Sinaliza que o gerador pode iniciar o próximo ciclo de criação de processos.
             geradoraOk.wait() #Principal espera o OK da geradora para continuar.
@@ -156,6 +154,8 @@ def principal():
             
         if t > parada: # Finaliza o programa se o tempo limite foi alcançado e não deseja-se continuar
             executaPrincipal.clear() # Indica que o programa principal deve parar
+            geradoraGo.set()
+            despachanteGo.set()
             print("Finalizando programa.")
             break
 
