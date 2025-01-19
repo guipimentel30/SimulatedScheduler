@@ -63,8 +63,6 @@ class Memory():
 
     def printMemory(self):
         for i in range(len(self.memoryVector)):
-            print(self.memoryVector[i][0])
-        for i in range(len(self.memoryVector)):
             if self.memoryVector[i][0] != 0:
                 print(f'Quadro {i} ocupado pelo Processo {self.memoryVector[i][0]}')
             else:

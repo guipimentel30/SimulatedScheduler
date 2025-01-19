@@ -40,7 +40,6 @@ executaPrincipal.set()
 
 lock = threading.Lock()  # Garante o acesso exclusivo às variáveis globais, listas e outros recursos, evitando condição de corrida e imprevisibilidades
 
-
 def thread_geradora():
     global id, t, alt, newQueue
     while executaPrincipal.is_set(): # Roda enquanto o programa não é encerrado pelo usuário
@@ -52,7 +51,6 @@ def thread_geradora():
 
         geradoraOk.set() # Indica para a principal que ação foi concluída, e ela pode voltar à sua função
         geradoraGo.clear()  # Reseta o próprio sinal, preparando para o próximo ciclo de execução.
-
 
 def thread_despachante():
     global t
@@ -82,8 +80,6 @@ def principal():
             for i in cpus:
                 i.run(readyQueue, auxiliarQueue, ioProcesses, memory)
 
-
-
         #   A thread Geradora de processs gera de zero a três processs aleatórios #
         #   e os aloca na fila de processs novos                                  #    
         if t <= alt: 
@@ -112,7 +108,6 @@ def principal():
                     print(f'CPU {cpu.name}: vazia')
         
         with lock:
-
             print(f'\nFila de novos: ', end="")
             for n in range(len(newQueue)):
                 if n != (len(newQueue)-1):
@@ -149,6 +144,9 @@ def principal():
         
         if t > parada:
             print("-------------------------------------------------\n") 
+            if (int(input("Digite '1' para vizualizar os quadros da memória: ")) == 1):
+                memory.printMemory()
+                print("\n") 
             parada += int(input("Insira quantas unidades de tempo vocês deseja simular: "))
             print("\n")
             
@@ -159,17 +157,11 @@ def principal():
             print("Finalizando programa.")
             break
 
-
-
-
-
 threadDespachante = threading.Thread(target=thread_despachante, name="Despachante")
 threadDespachante.start() # Inicia a thread despachante
 
-
 threadGeradora = threading.Thread(target=thread_geradora, name="Geradora")
 threadGeradora.start() # Inicia a thread geradora
-
 
 threadPrincipal = threading.Thread(target=principal, name="Principal")
 threadPrincipal.start() # Inicia a thread principal
