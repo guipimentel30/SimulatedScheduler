@@ -39,7 +39,7 @@ The project is organized into several modules, each handling a specific aspect o
 
 - **cpu.py**: Manages CPU operations and process execution.
 
-- **process.py**: Defines the Process class, its attributes and methods.
+- **process.py**: Defines the Process class, its attributes, states and methods. It is important to note that is follows a five states system.
 
 - **despachante.py**: Implements the dispatcher logic for scheduling processes.
 
