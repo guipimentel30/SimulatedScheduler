@@ -5,7 +5,6 @@ from processTable import ProcessTable
 from geradoraDeProcessos import GeradoraDeProcessos
 from memory import Memory
 import threading
-import time
 
 id = 1  #Variável que controla o identificador dos processos
 
